@@ -1,11 +1,47 @@
 use yew::prelude::*;
+use yew_router::prelude::*;
+
+#[derive(Clone, Routable, PartialEq)]
+enum Route {
+    #[at("/")]
+    Home,
+    #[at("/secure")]
+    Secure,
+    #[not_found]
+    #[at("/404")]
+    NotFound,
+}
+
+#[function_component(Secure)]
+fn secure() -> Html {
+    let history = use_history().unwrap();
+    let onclick = Callback::once(move |_| history.push(Route::Home));
+    html! {
+        <div>
+            <h1>{ "Secure" }</h1>
+            <button {onclick}>{ "Go Home" }</button>
+        </div>
+    }
+}
+
+fn switch(routes: &Route) -> Html {
+    match routes {
+        Route::Home => html! {
+            <Home />
+        },
+        Route::Secure => html! {
+            <Secure />
+        },
+        Route::NotFound => html! { <h1>{ "404" }</h1>},
+    }
+}
 
 struct Model {
     value: i32,
 }
 
-#[function_component(App)]
-pub fn app() -> Html {
+#[function_component(Home)]
+pub fn home() -> Html {
     let state = use_state(|| Model { value: 0 });
     let onclick = {
         let counter = state.clone();
@@ -20,6 +56,15 @@ pub fn app() -> Html {
             <button {onclick}>{ "+1" }</button>
             <p>{ state.value }</p>
         </div>
+    }
+}
+
+#[function_component(App)]
+fn app() -> Html {
+    html! {
+        <BrowserRouter>
+            <Switch<Route> render={Switch::render(switch)} />
+        </BrowserRouter>
     }
 }
 
