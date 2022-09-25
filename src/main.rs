@@ -14,12 +14,10 @@ enum Route {
 
 #[function_component(Secure)]
 fn secure() -> Html {
-    let history = use_history().unwrap();
-    let onclick = Callback::once(move |_| history.push(Route::Home));
     html! {
         <div>
             <h1>{ "Secure" }</h1>
-            <button {onclick}>{ "Go Home" }</button>
+            <Header />
         </div>
     }
 }
@@ -40,6 +38,23 @@ struct Model {
     value: i32,
 }
 
+#[function_component(Header)]
+pub fn header() -> Html {
+    let history = use_history().unwrap();
+    let on_click_home = {
+        let history = history.clone();
+        Callback::from(move |_| history.push(Route::Home))
+    };
+
+    let on_click_secure = { Callback::from(move |_| history.push(Route::Secure)) };
+    html! {
+        <div>
+            <button onclick={on_click_home}>{ "Home" }</button>
+            <button onclick={on_click_secure}>{ "Secure" }</button>
+        </div>
+    }
+}
+
 #[function_component(Home)]
 pub fn home() -> Html {
     let state = use_state(|| Model { value: 0 });
@@ -53,6 +68,7 @@ pub fn home() -> Html {
     };
     html! {
         <div>
+            <Header />
             <button {onclick}>{ "+1" }</button>
             <p>{ state.value }</p>
         </div>
